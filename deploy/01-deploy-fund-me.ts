@@ -20,18 +20,18 @@ const deployFundMe: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
     //when going for localhost or hardhat network we want to use a mock
     const args = [ethUsdPriceFeed];
-    // const fundMe = await deploy("FundMe", {
-    //     from: deployer,
-    //     args,
-    //     log: true,
-    //     waitConfirmations: networkConfig[network.name].blockConfirmations || 1,
-    // });
+    const fundMe = await deploy("FundMe", {
+        from: deployer,
+        args,
+        log: true,
+        waitConfirmations: networkConfig[network.name].blockConfirmations || 1,
+    });
 
     if (
         !developmentChains.includes(network.name) &&
         process.env.ETHERSCAN_API_KEY
     ) {
-        await verify("0x373AA9876f8e9e910b0B956eA9Ae408ADBb53e9a", args);
+        await verify(fundMe.address, args);
     }
     log("------------------------------------------------------");
 };
