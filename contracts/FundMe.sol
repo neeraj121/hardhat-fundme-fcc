@@ -1,16 +1,36 @@
 // SPDX-License-Identifier: MIT
+//Pragma
 pragma solidity ^0.8.0;
 
+//Imports
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "./PriceConverter.sol";
 
+//Error codes
+error FundMe_NotOwner();
+
+//Interfaces, Libraries, Contracts
+
+/** @title A contract for crowd funding
+ *  @author Me
+ *  @notice This contract is to demo a sample funding contract
+ *  @dev This implements Price Feed as our library
+ */
 contract FundMe {
+    // Type Declarations
     using PriceConverter for uint256;
 
+    // State Variables
     mapping(address => uint256) public s_addressToAmountFunded;
     address[] public s_funders;
     address public s_owner;
     AggregatorV3Interface public s_priceFeed;
+
+    // Modifiers
+    modifier onlyOwner() {
+        if (msg.sender != s_owner) revert FundMe_NotOwner();
+        _;
+    }
 
     constructor(address priceFeed) {
         s_priceFeed = AggregatorV3Interface(priceFeed);
@@ -30,11 +50,6 @@ contract FundMe {
 
     function getVersion() public view returns (uint256) {
         return s_priceFeed.version();
-    }
-
-    modifier onlyOwner() {
-        require(msg.sender == s_owner);
-        _;
     }
 
     function withdraw() public payable onlyOwner {
